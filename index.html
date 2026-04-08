@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>설비케어 | KP 현장설비 민원관리</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#0D1117;--sf:#161B22;--card:#21262D;--bd:#30363D;
+  --p:#FF6520;--pd:rgba(255,101,32,.13);--pb:rgba(255,101,32,.3);
+  --t:#E6EDF3;--mt:#8B949E;--mt2:#656D76;
+  --ok:#3FB950;--warn:#D29922;--info:#58A6FF;--err:#F85149;--pu:#A371F7;
+  --r:12px;--rs:8px;
+}
+html,body{height:100%;background:var(--bg);color:var(--t);font-family:'Noto Sans KR',-apple-system,sans-serif;font-size:15px}
+#app{min-height:100vh;max-width:480px;margin:0 auto;padding-bottom:76px;position:relative}
+body.adm #app{max-width:none;padding-bottom:0}
+@media(min-width:768px){
+  body.adm #app{display:grid;grid-template-columns:220px 1fr;height:100vh;overflow:hidden}
+  body.adm .mob-nav{display:none!important}
+  body.adm .adm-sb{display:flex!important}
+  body.adm .adm-ct{overflow-y:auto;height:100vh}
+}
+.adm-sb{display:none;flex-direction:column;background:var(--sf);border-right:1px solid var(--bd)}
+.sb-logo{padding:20px 16px 16px;border-bottom:1px solid var(--bd)}
+.sb-logo h2{font-size:15px;font-weight:700}
+.sb-logo p{font-size:11px;color:var(--mt);margin-top:2px}
+.sb-nav{padding:8px;flex:1}
+.sb-i{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:var(--rs);color:var(--mt);font-size:13px;font-weight:500;cursor:pointer;margin-bottom:1px;transition:.14s}
+.sb-i:hover{background:var(--card);color:var(--t)}
+.sb-i.act{background:var(--pd);color:var(--p)}
+.sb-ic{font-size:16px;width:22px;text-align:center}
+.mob-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:var(--sf);border-top:1px solid var(--bd);display:flex;z-index:100;padding:6px 0 calc(6px + env(safe-area-inset-bottom))}
+.ni{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:5px 0;cursor:pointer;color:var(--mt);font-size:10px;font-weight:500;background:none;border:none}
+.ni.act{color:var(--p)}
+.ni-ic{font-size:19px;line-height:1}
+.hd{position:sticky;top:0;z-index:50;background:var(--sf);border-bottom:1px solid var(--bd);padding:11px 14px;display:flex;align-items:center;gap:10px}
+.hd-bk{background:none;border:none;color:var(--t);cursor:pointer;font-size:17px;padding:3px;display:flex;align-items:center}
+.hd-t{font-size:16px;font-weight:700;flex:1}
+.hd-a{background:none;border:none;color:var(--mt);cursor:pointer;font-size:17px;padding:3px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:none;border-radius:var(--rs);padding:12px 18px;font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;transition:.12s;width:100%;letter-spacing:-.2px}
+.btn-p{background:var(--p);color:#fff}.btn-p:active{background:#e55919;transform:scale(.98)}
+.btn-s{background:var(--card);color:var(--t);border:1px solid var(--bd)}.btn-s:active{background:var(--sf)}
+.btn-g{background:transparent;color:var(--mt);border:1px solid var(--bd)}
+.btn-d{background:rgba(248,81,73,.12);color:var(--err);border:1px solid rgba(248,81,73,.28)}
+.btn-sm{padding:7px 13px;font-size:13px;border-radius:var(--rs);width:auto}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.fg{margin-bottom:13px}
+.fl{font-size:11px;font-weight:700;color:var(--mt);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;display:block}
+.fi{width:100%;background:var(--sf);border:1px solid var(--bd);border-radius:var(--rs);padding:11px 13px;color:var(--t);font-family:inherit;font-size:15px;outline:none;transition:.14s}
+.fi:focus{border-color:var(--p);box-shadow:0 0 0 3px var(--pd)}
+.fi::placeholder{color:var(--mt2)}
+.fi-ro{background:var(--bg);border-color:var(--pd);color:var(--t);cursor:default}
+.fi-ro:focus{border-color:var(--pb);box-shadow:0 0 0 3px var(--pd)}
+select.fi{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238B949E' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 13px center;padding-right:34px}
+textarea.fi{resize:vertical;min-height:90px}
+.eq-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+.eq-item,.site-btn{background:var(--sf);border:2px solid var(--bd);border-radius:10px;padding:9px 3px;text-align:center;cursor:pointer;transition:.14s}
+.eq-item.act,.site-btn.act{border-color:var(--p);background:var(--pd)}
+.eq-ic{font-size:21px;margin-bottom:3px}
+.eq-lb{font-size:10px;font-weight:700;color:var(--mt);line-height:1.2}
+.eq-item.act .eq-lb,.site-btn.act .site-lb{color:var(--p)}
+.bdg{display:inline-block;padding:3px 8px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:.2px}
+.b-접수{background:rgba(88,166,255,.15);color:#58A6FF}
+.b-업체전달{background:rgba(210,153,34,.15);color:#D29922}
+.b-처리중{background:rgba(163,113,247,.15);color:#A371F7}
+.b-완료{background:rgba(63,185,80,.15);color:#3FB950}
+.b-재접수{background:rgba(248,81,73,.15);color:#F85149}
+.cc{background:var(--card);border:1px solid var(--bd);border-radius:var(--r);padding:13px 15px;margin-bottom:7px;cursor:pointer;transition:.13s;border-left:3px solid var(--bd)}
+.cc:active{background:var(--sf);transform:scale(.99)}
+.cc.s-접수{border-left-color:#58A6FF}.cc.s-업체전달{border-left-color:#D29922}
+.cc.s-처리중{border-left-color:#A371F7}.cc.s-완료{border-left-color:#3FB950}.cc.s-재접수{border-left-color:#F85149}
+.cc-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5px}
+.cc-id{font-size:11px;color:var(--mt);font-weight:500}
+.cc-nm{font-size:14px;font-weight:700;margin-bottom:2px}
+.cc-sb{font-size:12px;color:var(--mt);margin-bottom:4px}
+.cc-ct{font-size:13px;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:5px}
+.cc-mt{display:flex;gap:10px;font-size:11px;color:var(--mt);flex-wrap:wrap}
+.sg{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;padding:14px}
+.sc{background:var(--card);border:1px solid var(--bd);border-radius:var(--r);padding:13px}
+.sc.hi{background:var(--pd);border-color:var(--pb)}
+.sv{font-size:28px;font-weight:700}
+.sc.hi .sv{color:var(--p)}
+.sl{font-size:11px;color:var(--mt);margin-top:2px}
+.f-tabs{display:flex;gap:6px;padding:10px 14px;overflow-x:auto;scrollbar-width:none}
+.f-tabs::-webkit-scrollbar{display:none}
+.f-tab{flex-shrink:0;background:var(--sf);border:1px solid var(--bd);border-radius:20px;padding:5px 13px;font-size:12px;font-weight:500;color:var(--mt);cursor:pointer;white-space:nowrap;transition:.13s}
+.f-tab.act{background:var(--pd);border-color:var(--pb);color:var(--p)}
+.toast{position:fixed;bottom:85px;left:50%;transform:translateX(-50%);background:#2d2d2d;color:#fff;padding:9px 18px;border-radius:28px;font-size:13px;z-index:500;white-space:nowrap;box-shadow:0 4px 18px rgba(0,0,0,.4);animation:tin .28s ease;pointer-events:none}
+.toast.err{background:#7a1f1f}
+@keyframes tin{from{opacity:0;transform:translateX(-50%) translateY(14px)}}
+.spin-ov{position:fixed;inset:0;background:rgba(13,17,23,.75);display:flex;align-items:center;justify-content:center;z-index:400}
+.spin{width:34px;height:34px;border:3px solid var(--bd);border-top-color:var(--p);border-radius:50%;animation:rot .75s linear infinite}
+@keyframes rot{to{transform:rotate(360deg)}}
+.auth-wrap{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 20px}
+.auth-logo{font-size:44px;margin-bottom:12px;animation:pop .4s ease}
+@keyframes pop{from{transform:scale(.7);opacity:0}}
+.auth-title{font-size:22px;font-weight:700;margin-bottom:5px;text-align:center}
+.auth-sub{font-size:13px;color:var(--mt);margin-bottom:24px;text-align:center;line-height:1.6}
+.auth-card{width:100%;max-width:360px;background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:20px}
+.auth-link{text-align:center;font-size:13px;color:var(--mt);margin-top:16px}
+.auth-link a{color:var(--info);cursor:pointer;text-decoration:none;font-weight:500}
+.auth-err{background:rgba(248,81,73,.12);border:1px solid rgba(248,81,73,.28);border-radius:var(--rs);padding:10px 13px;font-size:13px;color:var(--err);margin-bottom:12px;display:none}
+.auth-err.show{display:block}
+.auth-hint{background:rgba(88,166,255,.1);border:1px solid rgba(88,166,255,.25);border-radius:var(--rs);padding:10px 13px;font-size:12px;color:var(--info);margin-top:12px;line-height:1.6}
+.pw-hint{background:rgba(255,101,32,.08);border:1px solid rgba(255,101,32,.22);border-radius:var(--rs);padding:10px 13px;font-size:12px;color:var(--p);margin-bottom:14px;line-height:1.6}
+.user-chip{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:12px 14px;display:flex;align-items:center;gap:11px;margin:14px 14px 0}
+.u-av{width:38px;height:38px;border-radius:50%;background:var(--pd);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--p);flex-shrink:0;border:1.5px solid var(--pb)}
+.u-info h3{font-size:14px;font-weight:700;margin:0 0 2px}
+.u-info p{font-size:11px;color:var(--mt);margin:0}
+.u-out{margin-left:auto;background:none;border:1px solid var(--bd);border-radius:20px;padding:5px 11px;color:var(--mt);font-size:11px;font-family:inherit;cursor:pointer;transition:.13s;flex-shrink:0}
+.u-out:hover{color:var(--err);border-color:rgba(248,81,73,.4)}
+.home-btns{padding:12px 14px 0;display:flex;flex-direction:column;gap:9px}
+.hb{background:var(--card);border:1px solid var(--bd);border-radius:var(--r);padding:17px 15px;display:flex;align-items:center;gap:13px;cursor:pointer;transition:.13s}
+.hb:active{transform:scale(.99);background:var(--sf)}
+.hb.pri{background:var(--pd);border-color:var(--pb)}
+.hb-ico{font-size:26px;width:42px;text-align:center}
+.hb-tx h3{font-size:15px;font-weight:700;margin-bottom:2px}
+.hb-tx p{font-size:12px;color:var(--mt)}
+.hb.pri h3{color:var(--p)}
+.hb-ch{margin-left:auto;color:var(--mt);font-size:17px}
+.photo-up{border:2px dashed var(--bd);border-radius:var(--r);padding:18px;text-align:center;cursor:pointer;transition:.14s;background:var(--sf)}
+.photo-up:hover{border-color:var(--p)}
+.photo-prev{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:9px}
+.photo-th{position:relative;aspect-ratio:1;border-radius:var(--rs);overflow:hidden}
+.photo-th img{width:100%;height:100%;object-fit:cover}
+.photo-rm{position:absolute;top:4px;right:4px;background:rgba(0,0,0,.65);border:none;border-radius:50%;width:19px;height:19px;color:#fff;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.suc-wrap{padding:56px 18px;text-align:center}
+.suc-ic{font-size:60px;margin-bottom:18px}
+.suc-id{font-size:20px;font-weight:700;color:var(--p);margin:9px 0 4px;letter-spacing:2px}
+.tl{border-left:2px solid var(--bd);margin-left:7px;padding-left:15px}
+.tl-i{position:relative;margin-bottom:14px}.tl-i::before{content:'';position:absolute;left:-20px;top:4px;width:9px;height:9px;background:var(--bd);border-radius:50%;border:2px solid var(--bg)}
+.tl-i.lt::before{background:var(--p)}
+.tl-tm{font-size:11px;color:var(--mt);margin-bottom:2px}.tl-tx{font-size:13px}
+.det-c{background:var(--card);border:1px solid var(--bd);border-radius:var(--r);padding:14px;margin-bottom:10px}
+.det-s{font-size:11px;font-weight:700;color:var(--mt);text-transform:uppercase;letter-spacing:.5px;margin-bottom:11px}
+.det-r{display:flex;gap:8px;margin-bottom:9px;font-size:14px}.det-k{color:var(--mt);min-width:72px;flex-shrink:0}.det-v{font-weight:500;flex:1;word-break:break-word}
+.sf{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:14px}
+.sb{flex:1;min-width:calc(33% - 5px);padding:9px 4px;border-radius:var(--rs);border:2px solid var(--bd);background:var(--sf);color:var(--mt);font-size:12px;font-weight:700;cursor:pointer;text-align:center;transition:.13s;font-family:inherit}
+.sb.a-접수{border-color:#58A6FF;background:rgba(88,166,255,.13);color:#58A6FF}
+.sb.a-업체전달{border-color:#D29922;background:rgba(210,153,34,.13);color:#D29922}
+.sb.a-처리중{border-color:#A371F7;background:rgba(163,113,247,.13);color:#A371F7}
+.sb.a-완료{border-color:#3FB950;background:rgba(63,185,80,.13);color:#3FB950}
+.sb.a-재접수{border-color:#F85149;background:rgba(248,81,73,.13);color:#F85149}
+.pin-wrap{display:flex;flex-direction:column;align-items:center;padding:36px 18px}
+.pin-dots{display:flex;gap:13px;margin:20px 0 6px}.pin-dot{width:13px;height:13px;border-radius:50%;background:var(--bd);transition:.14s}.pin-dot.on{background:var(--p)}
+.pin-err{color:var(--err);font-size:13px;min-height:18px;margin-bottom:14px;text-align:center}
+.pin-kp{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;width:210px}
+.pin-k{background:var(--card);border:1px solid var(--bd);border-radius:var(--r);padding:15px;font-size:20px;font-weight:700;cursor:pointer;text-align:center;transition:.1s;font-family:inherit;color:var(--t)}
+.pin-k:active{background:var(--sf);transform:scale(.94)}
+.alert-i{background:rgba(88,166,255,.1);border:1px solid rgba(88,166,255,.25);border-radius:var(--rs);padding:10px 13px;font-size:12px;color:var(--info);line-height:1.6;margin:14px}
+.empty{padding:52px 18px;text-align:center;color:var(--mt)}.empty-ic{font-size:46px;margin-bottom:11px;opacity:.5}
+.user-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--bd)}.user-row:last-child{border-bottom:none}
+.u-mini-av{width:32px;height:32px;border-radius:50%;background:var(--pd);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--p);flex-shrink:0}
+.mode-tabs{display:flex;gap:8px;width:100%;max-width:360px;margin-bottom:14px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.note-box{background:rgba(88,166,255,.1);border:1px solid rgba(88,166,255,.25);border-radius:var(--rs);padding:10px 13px;font-size:12px;color:var(--info);line-height:1.6}
+.kpi-chip{display:inline-flex;align-items:center;gap:6px;padding:5px 9px;border:1px solid var(--bd);border-radius:999px;font-size:11px;color:var(--mt)}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="toast-ct"></div>
+<script>
+'use strict';
+
+const EQ=[
+  {id:'냉난방기',icon:'❄️'},{id:'정수기',icon:'💧'},{id:'제빙기',icon:'🧊'},
+  {id:'비데',icon:'🚽'},{id:'공기청정기',icon:'💨'},{id:'기타',icon:'🔧'},
+];
+const PROCS=['압연','압출','재단','성형','가류','검사','물류','휴게실','화장실','식당','관리동','기타'];
+const SITES=['KP','DP'];
+const FACTORIES={KP:['1공장','2공장','3공장','4공장'],DP:['1공장','2공장']};
+const STATS=['접수','업체전달','처리중','완료','재접수'];
+const GH_C='data/complaints.json';
+const GH_U='data/users.json';
+const GH_A='data/admins.json';
+
+let cfg=loadCfg();
+let complaints=localLoad('sbk_d');
+let users=localLoad('sbk_u');
+let admins=localLoad('sbk_a');
+let ghCsha=null, ghUsha=null, ghAsha=null;
+let curUser=safeJSON(localStorage.getItem('sbk_me'));
+let adminAuth=safeJSON(localStorage.getItem('sbk_admin_me'));
+let screen=adminAuth?'adminDash':(curUser?'home':'login');
+let loginMode='user';
+let selId=null, fStatus='all', fSite='all', pinBuf='', pinErr='', lastId=null;
+let trackQ='', trackRes=[];
+let formS={}, photoArr=[];
+let authErr='';
+
+function safeJSON(v){try{return JSON.parse(v||'null')}catch{return null}}
+function loadCfg(){try{return JSON.parse(localStorage.getItem('sbk_c')||'{}')}catch{return{}}}
+function saveCfg(){localStorage.setItem('sbk_c',JSON.stringify(cfg))}
+function localLoad(k){try{return JSON.parse(localStorage.getItem(k)||'[]')}catch{return[]}}
+function localSave(k,d){localStorage.setItem(k,JSON.stringify(d))}
+function ghOk(){return cfg.gt&&cfg.go&&cfg.gr}
+function setMe(u){curUser=u;localStorage.setItem('sbk_me',JSON.stringify(u))}
+function clearMe(){curUser=null;localStorage.removeItem('sbk_me')}
+function setAdminMe(a){adminAuth=a;localStorage.setItem('sbk_admin_me',JSON.stringify(a))}
+function clearAdminMe(){adminAuth=null;localStorage.removeItem('sbk_admin_me')}
+
+async function ghGet(file){
+  if(!ghOk()) return null;
+  const r=await fetch(`https://api.github.com/repos/${cfg.go}/${cfg.gr}/contents/${file}`,{headers:{Authorization:`Bearer ${cfg.gt}`,Accept:'application/vnd.github+json'}});
+  if(r.status===404) return {data:[],sha:null};
+  if(!r.ok) throw new Error(`GitHub ${r.status}`);
+  const j=await r.json();
+  return {data:JSON.parse(decodeURIComponent(escape(atob(j.content.replace(/\s/g,''))))),sha:j.sha};
+}
+async function ghPut(file,sha,data){
+  if(!ghOk()) return null;
+  const content=btoa(unescape(encodeURIComponent(JSON.stringify(data,null,2))));
+  const body={message:`update ${new Date().toISOString().slice(0,19)}Z`,content};
+  if(sha) body.sha=sha;
+  const r=await fetch(`https://api.github.com/repos/${cfg.go}/${cfg.gr}/contents/${file}`,{method:'PUT',headers:{Authorization:`Bearer ${cfg.gt}`,Accept:'application/vnd.github+json','Content-Type':'application/json'},body:JSON.stringify(body)});
+  if(!r.ok) throw new Error(`Save ${r.status}`);
+  return (await r.json()).content.sha;
+}
+async function loadComplaints(){if(ghOk()){const g=await ghGet(GH_C);if(g){ghCsha=g.sha;complaints=Array.isArray(g.data)?g.data:[];localSave('sbk_d',complaints)}}else complaints=localLoad('sbk_d');return complaints}
+async function saveComplaints(){localSave('sbk_d',complaints);if(ghOk()) ghCsha=await ghPut(GH_C,ghCsha,complaints)}
+async function loadUsers(){if(ghOk()){const g=await ghGet(GH_U);if(g){ghUsha=g.sha;users=Array.isArray(g.data)?g.data:[];localSave('sbk_u',users)}}else users=localLoad('sbk_u');return users}
+async function saveUsers(){localSave('sbk_u',users);if(ghOk()) ghUsha=await ghPut(GH_U,ghUsha,users)}
+async function loadAdmins(){
+  if(ghOk()){
+    const g=await ghGet(GH_A);
+    if(g){ghAsha=g.sha;admins=Array.isArray(g.data)?g.data:[];localSave('sbk_a',admins)}
+  }else admins=localLoad('sbk_a');
+  if(!Array.isArray(admins) || admins.length===0){
+    admins=[{admin_id:'admin',name:'시스템 관리자',password:'admin1234',role:'super',site:'ALL',created_at:new Date().toISOString()}];
+    await saveAdmins();
+  }
+  return admins;
+}
+async function saveAdmins(){localSave('sbk_a',admins);if(ghOk()) ghAsha=await ghPut(GH_A,ghAsha,admins)}
+
+function genId(){const n=new Date(),p=x=>String(x).padStart(2,'0');return `KP-${n.getFullYear()}${p(n.getMonth()+1)}${p(n.getDate())}-${String(Math.floor(Math.random()*99999)).padStart(5,'0')}`}
+function fmtD(iso){if(!iso) return '-';const d=new Date(iso);return `${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`}
+function fmtDF(iso){if(!iso) return '-';const d=new Date(iso);return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`}
+function getInitial(name){return name?name.charAt(0):''}
+function esc(v){return String(v??'').replace(/[&<>"']/g,s=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s]))}
+function toast(msg,err=false){const el=document.createElement('div');el.className='toast'+(err?' err':'');el.textContent=msg;document.getElementById('toast-ct').appendChild(el);setTimeout(()=>el.remove(),2200)}
+let spinEl=null; function spin(v){if(v&&!spinEl){spinEl=document.createElement('div');spinEl.className='spin-ov';spinEl.innerHTML='<div class="spin"></div>';document.body.appendChild(spinEl)}else if(!v&&spinEl){spinEl.remove();spinEl=null}}
+function downloadFile(filename,text,mime='text/plain;charset=utf-8'){const blob=new Blob([text],{type:mime});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url)}
+function exportComplaintsCSV(){
+  const data=getFilteredComplaints();
+  const headers=['id','created_at','site','equipment_type','process','factory','location','content','reporter','emp_id','phone','status','assignee_admin_name','vendor','admin_note','resolved_at'];
+  const rows=data.map(c=>[c.id,c.created_at,c.site,c.equipment_type,c.process,c.factory,c.location,(c.content||'').replace(/\n/g,' '),c.reporter,c.emp_id,c.phone,c.status,c.assignee_admin_name||'',c.vendor||'',(c.admin_note||'').replace(/\n/g,' '),c.resolved_at||'']);
+  const csv=[headers.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(','),...rows.map(r=>r.map(v=>`"${String(v??'').replace(/"/g,'""')}"`).join(','))].join('\n');
+  const d=new Date();
+  const name=`complaints_${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}.csv`;
+  downloadFile(name,'\uFEFF'+csv,'text/csv;charset=utf-8;');
+}
+function getComplaintById(id){return complaints.find(c=>c.id===id)}
+function getFilteredComplaints(){let filtered=[...complaints];if(fSite!=='all') filtered=filtered.filter(c=>c.site===fSite);if(fStatus!=='all') filtered=filtered.filter(c=>c.status===fStatus);return filtered}
+function isAdminScreen(s){return ['adminDash','adminList','adminDetail','adminUsers','settings'].includes(s)}
+function cap(s){return s.charAt(0).toUpperCase()+s.slice(1)}
+
+function go(s){
+  if(isAdminScreen(s) && !adminAuth){loginMode='admin';authErr='관리자 로그인 후 이용 가능합니다';screen='login';render();window.scrollTo(0,0);return}
+  screen=s;document.body.classList.toggle('adm',isAdminScreen(s));render();window.scrollTo(0,0)
+}
+
+function render(){
+  const app=document.getElementById('app');
+  switch(screen){
+    case 'login': app.innerHTML=sLogin();break;
+    case 'signup': app.innerHTML=sSignup();break;
+    case 'home': app.innerHTML=sHome();break;
+    case 'userForm': app.innerHTML=sUserForm(); setTimeout(renderPrev,0);break;
+    case 'userSuccess': app.innerHTML=sUserSuccess();break;
+    case 'userTrack': app.innerHTML=sUserTrack();break;
+    case 'userDetail': app.innerHTML=sUserDetail();break;
+    case 'adminLogin': app.innerHTML=sAdminLogin();break;
+    case 'adminDash': app.innerHTML=sAdmin('dash');break;
+    case 'adminList': app.innerHTML=sAdmin('list');break;
+    case 'adminDetail': app.innerHTML=sAdmin('detail');break;
+    case 'adminUsers': app.innerHTML=sAdmin('users');break;
+    case 'settings': app.innerHTML=sAdmin('settings');break;
+    default: app.innerHTML=sLogin();
+  }
+}
+
+function sLogin(){
+  return `<div class="auth-wrap">
+    <div class="auth-logo">🔧</div>
+    <h1 class="auth-title">설비케어</h1>
+    <p class="auth-sub">KP 현장설비 민원 통합관리 시스템</p>
+    <div class="mode-tabs">
+      <button class="btn ${loginMode==='user'?'btn-p':'btn-s'}" style="width:50%" onclick="setLoginMode('user')">현장직원</button>
+      <button class="btn ${loginMode==='admin'?'btn-p':'btn-s'}" style="width:50%" onclick="setLoginMode('admin')">관리자</button>
+    </div>
+    <div class="auth-card">
+      <div id="lg-err" class="auth-err${authErr?' show':''}">${esc(authErr)}</div>
+      ${loginMode==='user' ? `
+        <div class="fg"><label class="fl" for="lg-id">사번 (ID)</label><input class="fi" id="lg-id" type="text" inputmode="numeric" placeholder="예) 20230001"></div>
+        <div class="fg" style="margin-bottom:16px"><label class="fl" for="lg-pw">비밀번호</label><input class="fi" id="lg-pw" type="password" placeholder="사번 입력 (초기값)" onkeydown="if(event.key==='Enter')doLogin()"></div>
+        <button class="btn btn-p" onclick="doLogin()">🔐 로그인</button>
+        <div class="auth-hint">초기 비밀번호는 <strong>사번과 동일</strong>합니다.<br>계정이 없으시면 회원가입을 진행해주세요.</div>
+      ` : `
+        <div class="fg"><label class="fl" for="adm-id">관리자 ID</label><input class="fi" id="adm-id" type="text" placeholder="예) admin"></div>
+        <div class="fg" style="margin-bottom:16px"><label class="fl" for="adm-pw">비밀번호</label><input class="fi" id="adm-pw" type="password" placeholder="비밀번호 입력" onkeydown="if(event.key==='Enter')doAdminLogin()"></div>
+        <button class="btn btn-p" onclick="doAdminLogin()">🛡️ 관리자 로그인</button>
+        <div class="auth-hint">팀원별 관리자 ID/PW 로그인을 지원합니다.<br>비상 접속은 아래 PIN 로그인도 유지됩니다.</div>
+      `}
+    </div>
+    ${loginMode==='user'
+      ? `<div class="auth-link">계정이 없으신가요? <a onclick="go('signup')">회원가입</a></div>`
+      : `<div class="auth-link"><a onclick="go('adminLogin')">PIN으로 접속</a></div>`}
+    <p style="font-size:11px;color:var(--mt2);margin-top:24px;text-align:center">KP 설비기술팀 | DWP 설비케어 v1.2</p>
+  </div>`;
+}
+function showAuthErr(msg){authErr=msg;render()}
+window.setLoginMode=function(mode){loginMode=mode;authErr='';render()}
+window.doLogin=async function(){
+  const empId=(document.getElementById('lg-id')?.value||'').trim();
+  const pw=(document.getElementById('lg-pw')?.value||'').trim();
+  if(!empId||!pw){showAuthErr('사번과 비밀번호를 모두 입력해주세요');return}
+  spin(true);
+  try{await loadUsers();const u=users.find(x=>x.emp_id===empId);if(!u){showAuthErr('등록되지 않은 사번입니다. 회원가입을 진행해주세요');return}if(u.password!==pw){showAuthErr('비밀번호가 올바르지 않습니다');return}authErr='';setMe({emp_id:u.emp_id,name:u.name,phone:u.phone});go('home')}catch(e){showAuthErr('로그인 오류: '+e.message)}finally{spin(false)}}
+window.doAdminLogin=async function(){
+  const adminId=(document.getElementById('adm-id')?.value||'').trim();
+  const pw=(document.getElementById('adm-pw')?.value||'').trim();
+  if(!adminId||!pw){showAuthErr('관리자 ID와 비밀번호를 입력해주세요');return}
+  spin(true);
+  try{await loadAdmins();const a=admins.find(x=>x.admin_id===adminId);if(!a){showAuthErr('존재하지 않는 관리자 계정입니다');return}if(a.password!==pw){showAuthErr('관리자 비밀번호가 올바르지 않습니다');return}authErr='';setAdminMe({admin_id:a.admin_id,name:a.name,role:a.role,site:a.site});await loadAdminData();go('adminDash')}catch(e){showAuthErr('관리자 로그인 오류: '+e.message)}finally{spin(false)}}
+
+function sSignup(){return `<div class="auth-wrap"><div class="hd" style="position:fixed;top:0;left:0;right:0;max-width:none;z-index:100"><button class="hd-bk" onclick="go('login')">←</button><span class="hd-t">회원가입</span></div><div style="margin-top:60px;width:100%;max-width:360px"><div style="text-align:center;margin-bottom:20px"><h2 style="font-size:19px;font-weight:700;margin-bottom:6px">KP 임직원 계정 등록</h2><p style="font-size:13px;color:var(--mt);line-height:1.6">사번, 성명, 연락처를 입력하시면<br>즉시 로그인하여 민원 접수가 가능합니다</p></div><div class="auth-card"><div id="sg-err" class="auth-err${authErr?' show':''}">${esc(authErr)}</div><div class="pw-hint">초기 비밀번호는 <strong>사번과 동일</strong>하게 설정됩니다.</div><div class="fg"><label class="fl" for="sg-id">사번 *</label><input class="fi" id="sg-id" type="text" inputmode="numeric" placeholder="예) 20230001"></div><div class="fg"><label class="fl" for="sg-nm">성명 *</label><input class="fi" id="sg-nm" type="text" placeholder="홍길동"></div><div class="fg" style="margin-bottom:16px"><label class="fl" for="sg-ph">전화번호 *</label><input class="fi" id="sg-ph" type="tel" placeholder="010-0000-0000" onkeydown="if(event.key==='Enter')doSignup()"></div><button class="btn btn-p" onclick="doSignup()">✅ 가입 완료 &amp; 로그인</button></div><div class="auth-link">이미 계정이 있으신가요? <a onclick="go('login')">로그인으로</a></div></div></div>`}
+window.doSignup=async function(){const empId=(document.getElementById('sg-id')?.value||'').trim();const name=(document.getElementById('sg-nm')?.value||'').trim();const phone=(document.getElementById('sg-ph')?.value||'').trim();if(!empId||!name||!phone){showAuthErr('모든 항목을 입력해주세요');return}if(!/^\d+$/.test(empId)){showAuthErr('사번은 숫자만 입력 가능합니다');return}spin(true);try{await loadUsers();if(users.find(x=>x.emp_id===empId)){showAuthErr('이미 등록된 사번입니다');return}const newUser={emp_id:empId,name,phone,password:empId,created_at:new Date().toISOString(),role:'user'};users.push(newUser);await saveUsers();authErr='';setMe({emp_id:newUser.emp_id,name:newUser.name,phone:newUser.phone});toast(`${name}님, 환영합니다! 🎉`);go('home')}catch(e){showAuthErr('가입 오류: '+e.message)}finally{spin(false)}}
+
+function sHome(){
+  if(!curUser){go('login');return ''}
+  const nc=!ghOk();
+  return `<div class="user-chip"><div class="u-av">${esc(getInitial(curUser.name))}</div><div class="u-info"><h3>${esc(curUser.name)} 님</h3><p>사번: ${esc(curUser.emp_id)} · ${esc(curUser.phone)}</p></div><button class="u-out" onclick="doLogout()">로그아웃</button></div>
+  ${nc?`<div class="alert-i">GitHub 동기화 미설정 상태입니다. 현재는 브라우저 로컬 저장소에 저장됩니다.</div>`:''}
+  <div class="home-btns">
+    <div class="hb pri" onclick="go('userForm')"><span class="hb-ico">📋</span><div class="hb-tx"><h3>민원 접수하기</h3><p>설비 고장·불편사항 신고</p></div><span class="hb-ch">›</span></div>
+    <div class="hb" onclick="initTrack()"><span class="hb-ico">🔍</span><div class="hb-tx"><h3>접수 현황 확인</h3><p>내 민원 처리 상태 조회</p></div><span class="hb-ch">›</span></div>
+    <div class="hb" onclick="setLoginMode('admin');go('login')"><span class="hb-ico">🛡️</span><div class="hb-tx"><h3>관리자 페이지</h3><p>ID/PW 또는 PIN으로 접속</p></div><span class="hb-ch">›</span></div>
+  </div>
+  <p style="text-align:center;font-size:11px;color:var(--mt2);margin-top:22px;padding-bottom:14px">KP 설비기술팀 | DWP 설비케어 v1.2</p>`;
+}
+window.doLogout=function(){if(confirm('로그아웃 하시겠습니까?')){clearMe();authErr='';go('login')}}
+
+function sUserForm(){
+  if(!curUser){go('login');return ''}
+  const sel=formS.eq||'';const selSite=formS.site||'';const factList=selSite?(FACTORIES[selSite]||[]):[];
+  return `<div class="hd"><button class="hd-bk" onclick="go('home')">←</button><span class="hd-t">민원 접수</span></div>
+  <form id="cform" onsubmit="submitForm(event)" style="padding:14px">
+    <div class="fg"><span class="fl">사업장 *</span><div class="grid2">
+      ${SITES.map(s=>`<div class="site-btn ${selSite===s?'act':''}" onclick="selSite('${s}')"><div style="font-size:22px;margin-bottom:4px">${s==='KP'?'🏭':'🏗️'}</div><div class="site-lb" style="font-size:13px;font-weight:700;color:${selSite===s?'var(--p)':'var(--t)'}">${s}</div><div style="font-size:10px;color:var(--mt)">${s==='KP'?'금산공장':'대전공장'}</div></div>`).join('')}
+    </div><input type="hidden" id="f-site" value="${esc(selSite)}" required></div>
+    <div class="fg"><span class="fl">설비 종류 *</span><div class="eq-grid">${EQ.map(e=>`<div class="eq-item ${sel===e.id?'act':''}" onclick="selEq('${e.id}')"><div class="eq-ic">${e.icon}</div><div class="eq-lb">${e.id}</div></div>`).join('')}</div><input type="hidden" id="f-eq" value="${esc(sel)}" required></div>
+    <div class="grid2">
+      <div class="fg"><label class="fl" for="f-proc">공정/구역 *</label><select class="fi" id="f-proc" required onchange="formS.proc=this.value"><option value="">선택</option>${PROCS.map(p=>`<option ${formS.proc===p?'selected':''}>${p}</option>`).join('')}</select></div>
+      <div class="fg"><label class="fl" for="f-factory">공장 *</label><select class="fi" id="f-factory" required onchange="formS.factory=this.value" ${!selSite?'disabled':''}><option value="">${selSite?'선택':'사업장 먼저 선택'}</option>${factList.map(f=>`<option ${formS.factory===f?'selected':''}>${f}</option>`).join('')}</select></div>
+    </div>
+    <div class="fg"><label class="fl" for="f-loc">상세 위치 *</label><input class="fi" id="f-loc" type="text" placeholder="예) A동 3번 라인 옆, 창고 입구 우측" required value="${esc(formS.loc||'')}"></div>
+    <div class="fg"><label class="fl" for="f-cont">민원 내용 *</label><textarea class="fi" id="f-cont" placeholder="증상을 구체적으로 작성해주세요&#10;예) 냉방이 전혀 안 됨, 이상한 소리 남" required>${esc(formS.cont||'')}</textarea></div>
+    <div style="background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:14px;margin-bottom:13px"><div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><span style="font-size:13px;font-weight:700">신고자 정보</span><span style="font-size:10px;background:rgba(63,185,80,.12);color:var(--ok);padding:2px 8px;border-radius:4px;font-weight:700">로그인 정보 자동입력</span></div><div class="grid2"><div class="fg" style="margin-bottom:0"><label class="fl">성명</label><input class="fi fi-ro" type="text" value="${esc(curUser.name)}" readonly></div><div class="fg" style="margin-bottom:0"><label class="fl">사번</label><input class="fi fi-ro" type="text" value="${esc(curUser.emp_id)}" readonly></div></div><div class="fg" style="margin-top:9px;margin-bottom:0"><label class="fl">연락처</label><input class="fi fi-ro" type="tel" value="${esc(curUser.phone)}" readonly></div></div>
+    <div class="fg"><span class="fl">사진 첨부 (선택, 최대 3장)</span><div class="photo-up" onclick="document.getElementById('f-photo').click()"><div style="font-size:26px;margin-bottom:5px">📷</div><p style="font-size:12px;color:var(--mt)">탭하여 사진 첨부 (처리에 도움이 됩니다)</p></div><input type="file" id="f-photo" accept="image/*" multiple style="display:none" onchange="addPhoto(this)"><div id="photo-prev" class="photo-prev"></div></div>
+    <button type="submit" class="btn btn-p" style="margin-top:6px">📤 민원 접수하기</button><p style="font-size:11px;color:var(--mt);text-align:center;margin-top:9px">접수 후 설비기술팀에서 확인 연락 드립니다</p>
+  </form>`;
+}
+window.selEq=function(id){formS.eq=id;render()}
+window.selSite=function(site){formS.site=site;formS.factory='';render()}
+window.addPhoto=function(inp){const files=Array.from(inp.files||[]);if(photoArr.length+files.length>3){toast('최대 3장까지 첨부 가능합니다',true);inp.value='';return}files.forEach(f=>{const r=new FileReader();r.onload=e=>{photoArr.push({name:f.name,data:e.target.result});renderPrev()};r.readAsDataURL(f)});inp.value=''}
+function renderPrev(){const el=document.getElementById('photo-prev');if(!el) return;el.innerHTML=photoArr.map((p,i)=>`<div class="photo-th"><img src="${p.data}" alt="사진${i+1}"><button class="photo-rm" type="button" onclick="rmPhoto(${i})">✕</button></div>`).join('')}
+window.rmPhoto=function(i){photoArr.splice(i,1);renderPrev()}
+window.submitForm=async function(e){e.preventDefault();if(!curUser){go('login');return}const site=(document.getElementById('f-site')?.value||formS.site||'').trim();const eq=(document.getElementById('f-eq')?.value||formS.eq||'').trim();const factory=(document.getElementById('f-factory')?.value||'').trim();const process=(document.getElementById('f-proc')?.value||'').trim();const location=(document.getElementById('f-loc')?.value||'').trim();const content=(document.getElementById('f-cont')?.value||'').trim();if(!site){toast('사업장을 선택해주세요',true);return}if(!eq){toast('설비 종류를 선택해주세요',true);return}if(!process){toast('공정/구역을 선택해주세요',true);return}if(!factory){toast('공장을 선택해주세요',true);return}if(!location||!content){toast('필수 입력값을 확인해주세요',true);return}const now=new Date().toISOString();const complaint={id:genId(),created_at:now,site,equipment_type:eq,process,factory,location,content,reporter:curUser.name,emp_id:curUser.emp_id,phone:curUser.phone,photos:photoArr.slice(),status:'접수',vendor:'',admin_note:'',assignee_admin_id:'',assignee_admin_name:'',vendor_at:null,resolved_at:null,history:[{at:now,status:'접수',note:'민원 접수 완료'}]};spin(true);try{await loadComplaints();complaints.unshift(complaint);await saveComplaints();lastId=complaint.id;formS={};photoArr=[];go('userSuccess')}catch(err){toast('접수 오류: '+err.message,true)}finally{spin(false)}}
+
+function sUserSuccess(){return `<div class="suc-wrap"><div class="suc-ic">✅</div><h2 style="font-size:21px;font-weight:700;margin-bottom:7px">접수 완료!</h2><p style="color:var(--mt);font-size:13px;margin-bottom:14px">민원이 정상적으로 접수되었습니다</p><div class="det-c" style="display:inline-block;padding:14px 22px;margin-bottom:22px"><p style="font-size:11px;color:var(--mt);margin-bottom:4px">접수번호</p><p class="suc-id">${esc(lastId||'-')}</p><p style="font-size:11px;color:var(--mt);margin-top:4px">화면 캡처 또는 메모해두세요</p></div><div style="display:flex;flex-direction:column;gap:8px;max-width:260px;margin:0 auto"><button class="btn btn-s" onclick="gotoMyTrack()">🔍 내 민원 현황 보기</button><button class="btn btn-g" onclick="go('home')">홈으로</button></div></div>`}
+function initTrack(){trackQ='';trackRes=[];go('userTrack')}
+window.gotoMyTrack=async function(){trackQ=curUser?curUser.emp_id:'';if(trackQ){spin(true);try{await loadComplaints();trackRes=complaints.filter(c=>c.emp_id===trackQ||c.reporter===curUser.name)}finally{spin(false)}}go('userTrack')}
+function sUserTrack(){return `<div class="hd"><button class="hd-bk" onclick="go('home')">←</button><span class="hd-t">접수 현황 확인</span></div><div style="padding:14px"><div class="fg"><span class="fl">접수번호 또는 성명 / 사번 검색</span><div style="display:flex;gap:8px"><input class="fi" id="track-q" type="text" placeholder="KP-YYYYMMDD-##### / 이름 / 사번" value="${esc(trackQ)}" style="flex:1"><button class="btn btn-p btn-sm" onclick="doTrack()">검색</button></div></div>${curUser?`<button class="btn btn-s btn-sm" style="margin-bottom:12px" onclick="gotoMyTrack()">📋 내 민원만 보기</button>`:''}${trackQ&&trackRes.length===0?`<div class="empty"><div class="empty-ic">🔍</div><p>검색 결과가 없습니다</p></div>`:''}${trackRes.map(cardHTML).join('')}</div>`}
+function cardHTML(c){const eq=EQ.find(e=>e.id===c.equipment_type);return `<div class="cc s-${c.status}" onclick="viewUserDetail('${c.id}')"><div class="cc-top"><span class="cc-id">${esc(c.id)}</span><span class="bdg b-${c.status}">${c.status}</span></div><div class="cc-nm">${eq?eq.icon:''} ${esc(c.equipment_type)} 민원</div><div class="cc-sb">${esc(c.process)} ${esc(c.factory||'')} | ${esc(c.location)}</div><div class="cc-mt"><span>신고자: ${esc(c.reporter)}</span><span>접수: ${fmtD(c.created_at)}</span>${c.assignee_admin_name?`<span>담당: ${esc(c.assignee_admin_name)}</span>`:''}</div></div>`}
+window.doTrack=async function(){const q=(document.getElementById('track-q')?.value||'').trim();if(!q)return;trackQ=q;spin(true);try{await loadComplaints();trackRes=complaints.filter(c=>c.id.includes(q)||c.reporter.includes(q)||String(c.phone||'').includes(q)||String(c.emp_id||'')===q);render()}catch(err){toast('조회 오류: '+err.message,true)}finally{spin(false)}}
+window.viewUserDetail=function(id){selId=id;go('userDetail')}
+function sUserDetail(){const c=getComplaintById(selId);if(!c) return `<div class="empty"><div class="empty-ic">📄</div><p>민원을 찾을 수 없습니다</p></div>`;return detailTemplate(c,false,'userTrack')}
+
+function sAdminLogin(){const dots=[0,1,2,3].map(i=>`<div class="pin-dot${i<pinBuf.length?' on':''}"></div>`).join('');const keys=['1','2','3','4','5','6','7','8','9','','0','⌫'];return `<div class="hd"><button class="hd-bk" onclick="setLoginMode('admin');go('login')">←</button><span class="hd-t">관리자 PIN 로그인</span></div><div class="pin-wrap"><p style="font-size:14px;color:var(--mt)">관리자 PIN 번호를 입력하세요</p><div class="pin-dots">${dots}</div><p class="pin-err">${esc(pinErr)}</p><div class="pin-kp">${keys.map(k=>k===''?`<div></div>`:`<button class="pin-k" onclick="pinP('${k}')" type="button">${k}</button>`).join('')}</div><p style="font-size:11px;color:var(--mt2);margin-top:22px">초기 PIN: 0000</p></div>`}
+window.pinP=function(k){if(k==='⌫') pinBuf=pinBuf.slice(0,-1); else if(pinBuf.length<4) pinBuf+=k; if(pinBuf.length===4){if(pinBuf===(cfg.pin||'0000')){setAdminMe({admin_id:'pin-admin',name:'PIN 관리자',role:'super',site:'ALL'});pinBuf='';pinErr='';loadAdminData().then(()=>go('adminDash'))}else{pinErr='잘못된 PIN입니다';pinBuf='';setTimeout(()=>{pinErr='';render()},1200)}}render()}
+async function loadAdminData(){spin(true);try{await Promise.all([loadComplaints(),loadUsers(),loadAdmins()]);render()}catch(err){toast('로드 실패: '+err.message,true)}finally{spin(false)}}
+
+function sAdmin(sub){const items=[{id:'dash',lb:'대시보드',ic:'📊'},{id:'list',lb:'민원 목록',ic:'📋'},{id:'users',lb:'회원/관리자',ic:'👥'},{id:'settings',lb:'설정',ic:'⚙️'}];const sbNav=items.map(n=>`<div class="sb-i ${sub===n.id?'act':''}" onclick="go('admin${cap(n.id)}')"><span class="sb-ic">${n.ic}</span>${n.lb}</div>`).join('');const mobNav=items.map(n=>`<button class="ni ${sub===n.id?'act':''}" onclick="go('admin${cap(n.id)}')"><span class="ni-ic">${n.ic}</span>${n.lb}</button>`).join('')+`<button class="ni" onclick="adminLogout()"><span class="ni-ic">🚪</span>종료</button>`;let ct='';if(sub==='dash') ct=cDash(); else if(sub==='list') ct=cList(); else if(sub==='detail') ct=cAdminDetail(); else if(sub==='users') ct=cUsers(); else if(sub==='settings') ct=cSettings(); return `<div class="adm-sb"><div class="sb-logo"><h2>🔧 설비케어</h2><p>${adminAuth?esc(adminAuth.name):'관리자'} · ${adminAuth?esc(adminAuth.site||'ALL'):''}</p></div><div class="sb-nav">${sbNav}<div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--bd)"><div class="sb-i" onclick="adminLogout()"><span class="sb-ic">🚪</span>관리자 로그아웃</div></div></div></div><div class="adm-ct">${ct}<div class="mob-nav">${mobNav}</div></div>`}
+window.adminLogout=function(){if(confirm('관리자 세션을 종료하시겠습니까?')){clearAdminMe();pinBuf='';pinErr='';go(curUser?'home':'login')}}
+
+function cDash(){const today=new Date().toISOString().slice(0,10);const mo=today.slice(0,7);const tod=complaints.filter(c=>String(c.created_at||'').startsWith(today)).length;const pen=complaints.filter(c=>c.status!=='완료').length;const mon=complaints.filter(c=>String(c.created_at||'').startsWith(mo)).length;const done=complaints.filter(c=>c.status==='완료').length;const bySt=Object.fromEntries(STATS.map(s=>[s,complaints.filter(c=>c.status===s).length]));const stC={'접수':'#58A6FF','업체전달':'#D29922','처리중':'#A371F7','완료':'#3FB950','재접수':'#F85149'};const bars=STATS.map(s=>{const n=bySt[s]||0,pct=complaints.length?Math.round(n/complaints.length*100):0;return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:7px"><span style="font-size:11px;color:var(--mt);width:52px;flex-shrink:0">${s}</span><div style="flex:1;background:var(--bd);border-radius:3px;height:7px;overflow:hidden"><div style="width:${pct}%;background:${stC[s]};height:100%;border-radius:3px"></div></div><span style="font-size:11px;font-weight:700;width:18px;text-align:right">${n}</span></div>`}).join('');const byT=EQ.map(e=>({...e,cnt:complaints.filter(c=>c.equipment_type===e.id).length}));const recent=complaints.slice(0,5).map(c=>{const eq=EQ.find(e=>e.id===c.equipment_type);return `<div class="cc s-${c.status}" onclick="openDet('${c.id}')"><div class="cc-top"><span class="cc-id">${esc(c.id)}</span><span class="bdg b-${c.status}">${c.status}</span></div><div class="cc-nm">${eq?eq.icon:''} ${esc(c.equipment_type)} | ${esc(c.process)} ${esc(c.factory||'')}</div><div class="cc-sb">${c.site?`<span style="font-size:10px;background:var(--pd);color:var(--p);padding:1px 6px;border-radius:4px;font-weight:700;margin-right:5px">${c.site}</span>`:''}${esc(c.reporter)} (${esc(c.emp_id)}) · ${esc(c.phone)}</div><div class="cc-mt"><span>🕐 ${fmtD(c.created_at)}</span>${c.assignee_admin_name?`<span>담당: ${esc(c.assignee_admin_name)}</span>`:''}</div></div>`}).join('');return `<div class="hd"><span class="hd-t">대시보드</span><button class="hd-a" onclick="loadAdminData()">🔄</button></div><div class="sg"><div class="sc hi"><div class="sv">${tod}</div><div class="sl">오늘 접수</div></div><div class="sc"><div class="sv">${pen}</div><div class="sl">미완료</div></div><div class="sc"><div class="sv">${mon}</div><div class="sl">이번달 접수</div></div><div class="sc"><div class="sv">${done}</div><div class="sl">누적 완료</div></div></div><div style="padding:0 14px 14px"><div class="det-c"><div class="det-s">상태별 현황</div>${bars}</div><div class="det-c"><div class="det-s">설비별 접수 현황</div><div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;text-align:center">${byT.map(e=>`<div><div style="font-size:22px">${e.icon}</div><div style="font-size:18px;font-weight:700;color:var(--p)">${e.cnt}</div><div style="font-size:9px;color:var(--mt)">${e.id}</div></div>`).join('')}</div></div><div class="det-c" style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px"><span style="font-size:13px;font-weight:700">등록 회원</span><span style="font-size:20px;font-weight:700;color:var(--p)">${users.length}명</span></div><div class="det-c" style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px"><span style="font-size:13px;font-weight:700">등록 관리자</span><span style="font-size:20px;font-weight:700;color:var(--p)">${admins.length}명</span></div><div class="det-s" style="margin-top:4px">최근 접수 민원</div>${complaints.length===0?`<div class="empty"><div class="empty-ic">📋</div><p>접수된 민원이 없습니다</p></div>`:recent}</div>`}
+
+function cList(){const filtered=getFilteredComplaints();const statusTabs=['all',...STATS].map(s=>{const cnt=s==='all'?complaints.filter(c=>fSite==='all'||c.site===fSite).length:complaints.filter(c=>(fSite==='all'||c.site===fSite)&&c.status===s).length;return `<div class="f-tab ${fStatus===s?'act':''}" onclick="setFS('${s}')">${s==='all'?'전체':s} (${cnt})</div>`}).join('');const siteTabs=['all',...SITES].map(s=>{const cnt=s==='all'?complaints.length:complaints.filter(c=>c.site===s).length;return `<div class="f-tab ${fSite===s?'act':''}" onclick="setSiteFilter('${s}')">${s==='all'?'전체사업장':s} (${cnt})</div>`}).join('');const cards=filtered.map(c=>{const eq=EQ.find(e=>e.id===c.equipment_type);return `<div class="cc s-${c.status}" onclick="openDet('${c.id}')"><div class="cc-top"><span class="cc-id">${esc(c.id)}</span><span class="bdg b-${c.status}">${c.status}</span></div><div class="cc-nm">${eq?eq.icon:''} ${esc(c.equipment_type)}</div><div class="cc-sb">${c.site?`<span style="font-size:10px;background:var(--pd);color:var(--p);padding:1px 6px;border-radius:4px;font-weight:700;margin-right:4px">${c.site}</span>`:''}${esc(c.process)} · ${esc(c.factory||'')} · ${esc(c.location)}</div><div class="cc-ct">${esc(c.content)}</div><div class="cc-mt"><span>👤 ${esc(c.reporter)} (${esc(c.emp_id||'-')})</span><span>📞 ${esc(c.phone)}</span><span>담당: ${esc(c.assignee_admin_name||'-')}</span><span>🕐 ${fmtD(c.created_at)}</span></div></div>`}).join('');return `<div class="hd"><span class="hd-t">민원 목록</span><div style="display:flex;gap:6px"><button class="hd-a" onclick="exportComplaintsCSV()">⬇️</button><button class="hd-a" onclick="loadAdminData()">🔄</button></div></div><div class="f-tabs">${siteTabs}</div><div class="f-tabs">${statusTabs}</div><div style="padding:0 14px">${filtered.length===0?`<div class="empty"><div class="empty-ic">📋</div><p>해당 민원이 없습니다</p></div>`:cards}</div>`}
+window.setFS=function(s){fStatus=s;render()}
+window.setSiteFilter=function(s){fSite=s;render()}
+window.openDet=function(id){selId=id;go('adminDetail')}
+
+function detailTemplate(c,isAdm,backScreen){const eq=EQ.find(e=>e.id===c.equipment_type);const photos=(c.photos||[]).map(p=>`<div class="photo-th"><img src="${p.data}" alt="${esc(p.name)}"></div>`).join('');const tl=(c.history||[]).slice().reverse().map((h,i)=>`<div class="tl-i${i===0?' lt':''}"><div class="tl-tm">${fmtDF(h.at)}</div><div class="tl-tx"><span class="bdg b-${h.status}">${h.status}</span>${h.note?` — ${esc(h.note)}`:''}</div></div>`).join('');const assigneeOptions=admins.map(a=>`<option value="${esc(a.admin_id)}" ${c.assignee_admin_id===a.admin_id?'selected':''}>${esc(a.name)} (${esc(a.admin_id)})${a.site?` - ${esc(a.site)}`:''}</option>`).join('');return `<div class="hd"><button class="hd-bk" onclick="go('${backScreen}')">←</button><span class="hd-t">민원 상세</span></div><div style="padding:14px"><div class="det-c"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px"><span style="font-size:11px;color:var(--mt)">${esc(c.id)}</span><span class="bdg b-${c.status}">${c.status}</span></div><h2 style="font-size:17px;font-weight:700;margin-bottom:4px">${eq?eq.icon:''} ${esc(c.equipment_type)} 민원</h2><p style="font-size:12px;color:var(--mt)">접수: ${fmtDF(c.created_at)}</p></div><div class="det-c"><div class="det-s">위치 정보</div><div class="det-r"><span class="det-k">사업장</span><span class="det-v">${c.site?`<span style="background:var(--pd);color:var(--p);padding:2px 8px;border-radius:4px;font-weight:700;font-size:13px">${c.site}</span>`:'-'}</span></div><div class="det-r"><span class="det-k">공정/구역</span><span class="det-v">${esc(c.process)}</span></div><div class="det-r"><span class="det-k">공장</span><span class="det-v">${esc(c.factory||'-')}</span></div><div class="det-r"><span class="det-k">상세 위치</span><span class="det-v">${esc(c.location)}</span></div></div><div class="det-c"><div class="det-s">민원 내용</div><p style="font-size:14px;line-height:1.7">${esc(c.content)}</p>${photos?`<div class="photo-prev" style="margin-top:10px">${photos}</div>`:''}</div><div class="det-c"><div class="det-s">신고자 정보</div><div class="det-r"><span class="det-k">성명</span><span class="det-v">${esc(c.reporter)}</span></div><div class="det-r"><span class="det-k">사번</span><span class="det-v">${esc(c.emp_id||'-')}</span></div><div class="det-r"><span class="det-k">연락처</span><span class="det-v"><a href="tel:${esc(c.phone)}" style="color:var(--info)">${esc(c.phone)}</a></span></div></div>${isAdm?`<div class="det-c"><div class="det-s">처리 관리</div><div class="fg"><span class="fl">처리 상태 변경</span><div class="sf">${STATS.map(s=>`<button class="sb ${c.status===s?'a-'+s:''}" onclick="setStat('${s}')" type="button">${s}</button>`).join('')}</div></div><div class="fg"><label class="fl" for="d-assignee">민원 담당자</label><select class="fi" id="d-assignee"><option value="">미지정</option>${assigneeOptions}</select></div><div class="fg"><label class="fl" for="d-ven">담당 업체</label><input class="fi" id="d-ven" type="text" placeholder="협력업체명 및 담당자 연락처" value="${esc(c.vendor||'')}"></div><div class="fg"><label class="fl" for="d-note">처리 메모</label><textarea class="fi" id="d-note" placeholder="처리 내용, 특이사항 등">${esc(c.admin_note||'')}</textarea></div><button class="btn btn-p" onclick="saveDet()">💾 저장하기</button></div>`:''}<div class="det-c"><div class="det-s">처리 이력</div><div class="tl">${tl||'<p style="color:var(--mt);font-size:13px">이력 없음</p>'}</div></div></div>`}
+function cAdminDetail(){const c=getComplaintById(selId);if(!c) return `<div class="empty"><div class="empty-ic">📄</div><p>민원을 찾을 수 없습니다</p></div>`;return detailTemplate(c,true,'adminList')}
+window.setStat=function(s){const c=getComplaintById(selId);if(c){c.status=s;render()}}
+window.saveDet=async function(){const c=getComplaintById(selId);if(!c) return;const ven=document.getElementById('d-ven')?.value||'';const note=document.getElementById('d-note')?.value||'';const assigneeId=document.getElementById('d-assignee')?.value||'';const assignee=admins.find(a=>a.admin_id===assigneeId);const lastSt=(c.history&&c.history.length>0)?c.history[c.history.length-1].status:'';c.vendor=ven;c.admin_note=note;c.assignee_admin_id=assignee?assignee.admin_id:'';c.assignee_admin_name=assignee?assignee.name:'';if(c.status==='완료'&&!c.resolved_at) c.resolved_at=new Date().toISOString();if(c.status!==lastSt||note||c.assignee_admin_name){if(!c.history) c.history=[];c.history.push({at:new Date().toISOString(),status:c.status,note:note || `상태: ${c.status}${c.assignee_admin_name?` / 담당자: ${c.assignee_admin_name}`:''}`})}spin(true);try{await saveComplaints();toast('저장되었습니다 ✓');render()}catch(err){toast('저장 실패: '+err.message,true)}finally{spin(false)}}
+
+function cUsers(){const adminRows=admins.map(a=>`<div class="user-row"><div class="u-mini-av">🛡️</div><div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:700">${esc(a.name)}</div><div style="font-size:11px;color:var(--mt)">${esc(a.admin_id)} · ${esc(a.site||'ALL')} · ${esc(a.role||'manager')}</div><div style="font-size:10px;color:var(--mt2)">등록: ${fmtDF(a.created_at)}</div></div><div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end">${a.admin_id!=='admin'?`<button class="btn btn-d btn-sm" onclick="deleteAdmin('${a.admin_id}')">삭제</button>`:`<span class="kpi-chip">기본계정</span>`}</div></div>`).join('');const userRows=users.map(u=>`<div class="user-row"><div class="u-mini-av">${esc(getInitial(u.name))}</div><div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:700">${esc(u.name)}</div><div style="font-size:11px;color:var(--mt)">사번: ${esc(u.emp_id)} · ${esc(u.phone)}</div><div style="font-size:10px;color:var(--mt2)">가입: ${fmtDF(u.created_at)}</div></div><div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end"><span class="kpi-chip">${complaints.filter(c=>c.emp_id===u.emp_id).length}건</span><button class="btn btn-s btn-sm" onclick="resetUserPassword('${u.emp_id}')">비번초기화</button></div></div>`).join('');return `<div class="hd"><span class="hd-t">회원/관리자 관리</span><button class="hd-a" onclick="loadAdminData()">🔄</button></div><div style="padding:14px"><div class="det-c"><div class="det-s">관리자 추가</div><div class="grid2"><div class="fg"><label class="fl">관리자 ID</label><input class="fi" id="new-admin-id" placeholder="예) kp_manager1"></div><div class="fg"><label class="fl">이름</label><input class="fi" id="new-admin-name" placeholder="홍길동"></div></div><div class="grid2"><div class="fg"><label class="fl">비밀번호</label><input class="fi" id="new-admin-pw" type="password" placeholder="초기 비밀번호"></div><div class="fg"><label class="fl">담당 사업장</label><select class="fi" id="new-admin-site"><option value="ALL">ALL</option><option value="KP">KP</option><option value="DP">DP</option></select></div></div><button class="btn btn-p" onclick="addAdmin()">관리자 추가</button></div><div class="det-c"><div class="det-s">관리자 목록</div>${admins.length===0?`<div class="empty" style="padding:20px"><div class="empty-ic">🛡️</div><p>등록된 관리자가 없습니다</p></div>`:adminRows}</div><div class="det-c"><div class="det-s">회원 목록</div>${users.length===0?`<div class="empty" style="padding:20px"><div class="empty-ic">👥</div><p>등록된 회원이 없습니다</p></div>`:userRows}</div></div>`}
+window.addAdmin=async function(){const admin_id=(document.getElementById('new-admin-id')?.value||'').trim();const name=(document.getElementById('new-admin-name')?.value||'').trim();const password=(document.getElementById('new-admin-pw')?.value||'').trim();const site=(document.getElementById('new-admin-site')?.value||'ALL').trim();if(!admin_id||!name||!password){toast('관리자 정보를 모두 입력해주세요',true);return}if(admins.find(a=>a.admin_id===admin_id)){toast('이미 존재하는 관리자 ID입니다',true);return}admins.push({admin_id,name,password,site,role:'manager',created_at:new Date().toISOString()});spin(true);try{await saveAdmins();toast('관리자 계정이 추가되었습니다');render()}catch(err){toast('관리자 추가 실패: '+err.message,true)}finally{spin(false)}}
+window.deleteAdmin=async function(adminId){if(!confirm('해당 관리자 계정을 삭제하시겠습니까?')) return;admins=admins.filter(a=>a.admin_id!==adminId);spin(true);try{await saveAdmins();complaints.forEach(c=>{if(c.assignee_admin_id===adminId){c.assignee_admin_id='';c.assignee_admin_name=''}});await saveComplaints();toast('관리자 계정이 삭제되었습니다');render()}catch(err){toast('관리자 삭제 실패: '+err.message,true)}finally{spin(false)}}
+window.resetUserPassword=async function(empId){if(!confirm(`${empId} 계정의 비밀번호를 사번으로 초기화하시겠습니까?`)) return;const u=users.find(x=>x.emp_id===empId);if(!u) return;u.password=u.emp_id;spin(true);try{await saveUsers();toast('회원 비밀번호가 초기화되었습니다');render()}catch(err){toast('비밀번호 초기화 실패: '+err.message,true)}finally{spin(false)}}
+
+function cSettings(){return `<div class="hd"><span class="hd-t">설정</span></div><div style="padding:14px"><div class="det-c"><div class="det-s">🐙 GitHub 연동 설정</div><p style="font-size:12px;color:var(--mt);line-height:1.7;margin-bottom:12px">Personal Access Token과 저장소를 설정하면 민원, 회원, 관리자 정보가 GitHub에 동기화됩니다.<br><span style="color:var(--err)">주의: GitHub Pages 같은 공개 프론트엔드 배포에서는 토큰이 노출될 수 있습니다. 공개 배포 시에는 로컬 저장소만 사용하거나 서버 프록시 방식으로 전환하는 편이 안전합니다.</span></p><div class="fg"><label class="fl" for="s-tok">GitHub Personal Access Token</label><input class="fi" id="s-tok" type="password" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" value="${esc(cfg.gt||'')}"><p style="font-size:11px;color:var(--mt);margin-top:4px">Contents 권한(Read/Write)이 필요합니다.</p></div><div class="grid2"><div class="fg"><label class="fl" for="s-own">GitHub Owner (username)</label><input class="fi" id="s-own" type="text" placeholder="your-username" value="${esc(cfg.go||'')}"></div><div class="fg"><label class="fl" for="s-rep">Repository 이름</label><input class="fi" id="s-rep" type="text" placeholder="kp-complaints" value="${esc(cfg.gr||'')}"></div></div></div><div class="det-c"><div class="det-s">🔐 관리자 PIN 변경</div><div class="grid2"><div class="fg"><label class="fl" for="s-pin">새 PIN (숫자 4자리)</label><input class="fi" id="s-pin" type="password" maxlength="4" inputmode="numeric" placeholder="0000" value="${esc(cfg.pin||'0000')}"></div><div class="fg"><label class="fl" for="s-pin2">PIN 확인</label><input class="fi" id="s-pin2" type="password" maxlength="4" inputmode="numeric" placeholder="0000"></div></div></div><button class="btn btn-p" onclick="saveCfgUI()">💾 설정 저장</button><div style="height:1px;background:var(--bd);margin:18px 0"></div><div class="det-c" style="border-color:rgba(248,81,73,.3)"><div class="det-s" style="color:var(--err)">⚠️ 데이터 관리</div><p style="font-size:12px;color:var(--mt);line-height:1.6;margin-bottom:10px">기기 내 임시 데이터 삭제 (GitHub 저장 데이터는 유지)</p><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-d btn-sm" onclick="clearLocalData('sbk_d','민원')">민원 로컬 초기화</button><button class="btn btn-d btn-sm" onclick="clearLocalData('sbk_u','회원')">회원 로컬 초기화</button><button class="btn btn-d btn-sm" onclick="clearLocalData('sbk_a','관리자')">관리자 로컬 초기화</button></div></div><div style="height:1px;background:var(--bd);margin:18px 0"></div><div class="det-c" style="background:var(--pd);border-color:var(--pb)"><div class="det-s">ℹ️ 앱 정보</div><div class="det-r"><span class="det-k">버전</span><span class="det-v">DWP 설비케어 v1.2</span></div><div class="det-r"><span class="det-k">담당팀</span><span class="det-v">KP 설비기술팀</span></div><div class="det-r"><span class="det-k">GitHub DB</span><span class="det-v">${ghOk()?'✅ 연결됨':'❌ 미연결 (로컬 저장)'}</span></div><div class="det-r"><span class="det-k">민원 건수</span><span class="det-v">${complaints.length}건</span></div><div class="det-r"><span class="det-k">등록 회원</span><span class="det-v">${users.length}명</span></div><div class="det-r"><span class="det-k">등록 관리자</span><span class="det-v">${admins.length}명</span></div></div></div>`}
+window.saveCfgUI=function(){const tok=(document.getElementById('s-tok')?.value||'').trim();const own=(document.getElementById('s-own')?.value||'').trim();const rep=(document.getElementById('s-rep')?.value||'').trim();const pin=document.getElementById('s-pin')?.value||'';const pin2=document.getElementById('s-pin2')?.value||'';if(pin&&pin!==pin2){toast('PIN이 일치하지 않습니다',true);return}if(pin&&!/^\d{4}$/.test(pin)){toast('PIN은 숫자 4자리입니다',true);return}cfg.gt=tok;cfg.go=own;cfg.gr=rep;if(pin) cfg.pin=pin;saveCfg();toast('설정이 저장되었습니다 ✓');render()}
+window.clearLocalData=function(key,label){if(confirm(`로컬 ${label} 데이터를 초기화하시겠습니까?`)){localStorage.removeItem(key);if(key==='sbk_d') complaints=[];if(key==='sbk_u') users=[];if(key==='sbk_a') admins=[];toast(`${label} 로컬 데이터 초기화 완료`);render()}}
+
+(async function init(){document.body.classList.toggle('adm',isAdminScreen(screen));try{await Promise.all([loadUsers(),loadComplaints(),loadAdmins()])}catch(e){console.warn(e)}render()})();
+</script>
+</body>
+</html>
